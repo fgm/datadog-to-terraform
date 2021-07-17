@@ -1,4 +1,4 @@
-import { generateDashboardTerraformCode } from "../app/dashboard-converter";
+import { generateDashboardTerraformCode } from "../src/lib/dashboard-converter";
 import screenboardData from "../examples/screenboard.json";
 import timeboardData from "../examples/timeboard.json";
 import dashboardWithGroupData from "../examples/dashboard-with-group.json";
