@@ -58,6 +58,7 @@ func emitOutput(path string, tf string) error {
 func main() {
 	inFile := flag.String("if", "-", `Input file. "-" means standard input.`)
 	outFile := flag.String("of", "-", `Output file. "-" means standard output.`)
+	name := flag.String("name", "INVALID_NAME", `Name. Only useed with (dash|time)boards.`)
 	flag.Parse()
 
 	var dt convert.DataDogDocumentType
@@ -72,7 +73,7 @@ func main() {
 
 	switch dt {
 	case convert.DashboardType:
-		tf, err = convert.Dashboard(jd)
+		tf, err = convert.Dashboard(jd, *name)
 	case convert.MonitorType:
 		tf, err = convert.Monitor(jd)
 	default:

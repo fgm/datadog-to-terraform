@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Convert timeboard" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="datadog-to-terraform" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="-if examples/timeboard.json -name example_timeboard" />
+    <kind value="PACKAGE" />
+    <package value="github.com/fgm/datadog-to-terraform/cmd" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/dd2tf.go" />
+    <method v="2" />
+  </configuration>
+</component>
