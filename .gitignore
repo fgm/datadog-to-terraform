@@ -3,5 +3,6 @@
 lib/
 node_modules/
 .idea
+.run
 *.iml
 .history
