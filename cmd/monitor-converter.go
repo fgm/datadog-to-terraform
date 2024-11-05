@@ -12,7 +12,7 @@ var MONITOR = map[string]stringFunc{
 	"query":   stringGen("query"),
 	"type":    stringGen("type"),
 	"options": func(v any) string {
-		return mapContents(v.(map[string]any), func(k1 string, v1 any) string { return convertFromDefinition(OPTIONS, k1, v1) })
+		return mapContents(v.(map[string]any), func(k1 string, v1 any) string { return must(convertFromDefinition(OPTIONS, k1, v1)) })
 	},
 	"id":               blankGen,
 	"tags":             stringGen("tags"),
@@ -52,7 +52,7 @@ var OPTIONS = map[string]stringFunc{
 func generateMonitorTerraformCode(resourceName string, monitorData map[string]any) string {
 	var result strings.Builder
 	for k, v := range monitorData {
-		result.WriteString(convertFromDefinition(MONITOR, k, v))
+		result.WriteString(must(convertFromDefinition(MONITOR, k, v)))
 	}
 	return fmt.Sprintf("resource \"datadog_monitor\" \"%s\" {%s\n}", resourceName, result.String())
 }

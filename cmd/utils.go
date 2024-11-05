@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"sort"
 	"strings"
 )
@@ -20,8 +19,13 @@ func assignmentString(key string, value any) string {
 func block(name string, contents jmap, converter func(string, any) string) string {
 	var result strings.Builder
 	result.WriteString(fmt.Sprintf("\n%s {", name))
-	for k, v := range contents {
-		result.WriteString(converter(k, v))
+	keys := make([]string, 0, len(contents))
+	for k := range contents {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		result.WriteString(converter(k, contents[k]))
 	}
 	result.WriteString("\n}")
 	return result.String()
@@ -38,43 +42,45 @@ func blockList(array jmaps, blockName string, contentConverter func(string, any)
 }
 
 // Converts a key-value pair using a definition set
-func convertFromDefinition(definitionSet map[string]stringFunc, name string, v any) string {
+func convertFromDefinition(definitionSet map[string]stringFunc, name string, v any) (string, error) {
 	if converter, exists := definitionSet[name]; exists {
-		return converter(v)
+		return converter(v), nil
 	}
-	log.Fatalf("Can't convert key '%s' with value %#v\n", name, v)
-	return ""
+	return "", fmt.Errorf("can't convert key '%s' with value %#v", name, v)
 }
 
-func jmapsFromAny(v any) jmaps {
+// jmapsFromAny extract a jmaps from an "any" value which is actually a jmap
+// or a slice in which elements are also "any" values with a dynamic jmap value.
+func jmapsFromAny(v any) (jmaps, error) {
 	slice, ok := v.([]any)
 	if !ok {
-		log.Fatalf("widgets expected as []any but got %T: %#v\n", v, v)
+		return nil, fmt.Errorf("items expected as []any but got %T: %#v", v, v)
 	}
-	widgets := make(jmaps, len(slice))
-	for i, widget := range slice {
-		widgets[i], ok = widget.(jmap)
+	items := make(jmaps, len(slice))
+	for i, item := range slice {
+		items[i], ok = item.(jmap)
 		if !ok {
-			log.Fatalf("widgets[%d] expected as jmap but got %T: %#v\n", i, widget, widget)
+			return nil, fmt.Errorf("item [%d] expected as jmap but got %T: %#v", i, item, item)
 		}
 	}
-	return widgets
+	return items, nil
 }
 
-// Converts a value to a literal string representation
+// Converts a string or list of strings value to a literal string representation
 func literalString(value any) string {
 	switch v := value.(type) {
 	case string:
-		if strings.Contains(v, "\n") {
+		if strings.Contains(value.(string), "\n") {
 			return fmt.Sprintf("<<EOF\n%s\nEOF", v)
 		}
 		return fmt.Sprintf("\"%s\"", v)
-	case []any:
+	case []string:
 		var result strings.Builder
 		result.WriteString("[")
+		max := len(v) - 1
 		for i, elem := range v {
 			result.WriteString(literalString(elem))
-			if i != len(v)-1 {
+			if i != max {
 				result.WriteString(",")
 			}
 		}
@@ -98,6 +104,13 @@ func mapContents(contents jmap, converter func(string, any) string) string {
 		result.WriteString(converter(k, contents[k]))
 	}
 	return result.String()
+}
+
+func must[T any](x T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return x
 }
 
 // Creates a query block with a name and converted contents
