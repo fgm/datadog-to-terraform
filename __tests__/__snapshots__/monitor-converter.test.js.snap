@@ -8,11 +8,11 @@ query = \\"avg(last_4h):anomalies(avg:system.cpu.user{*}, 'basic', 2, direction=
 message = <<EOF
 Some other info..
 
-{{#is_alert}}Possible explanations are x, y or z. Check blah, blah blah.{{/is_alert}}
+{{#is_alert}}Possible explanations are x, y or z. Check blah, blah blah.{{/is_alert}} 
 
-{{#is_warning}}CPU is at an acceptable level again{{/is_warning}}
+{{#is_warning}}CPU is at an acceptable level again{{/is_warning}} 
 
-@all
+@all 
 EOF
 tags = [\\"team-cpu\\"]
 escalation_message = \\"\\"
@@ -20,18 +20,18 @@ evaluation_delay = 70
 groupby_simple_monitor = true
 include_tags = true
 locked = true
+new_group_delay = 60
 new_host_delay = 300
 no_data_timeframe = 10
 notify_audit = false
 notify_no_data = true
-renotify_interval = 0
-require_full_window = true
-new_group_delay = 60
 on_missing_data = \\"default\\"
+renotify_interval = 0
+renotify_statuses = [\\"alert\\"]
 require_full_window = true
 monitor_threshold_windows {
-trigger_window = \\"last_15m\\"
 recovery_window = \\"last_15m\\"
+trigger_window = \\"last_15m\\"
 }
 monitor_thresholds {
 critical = 1

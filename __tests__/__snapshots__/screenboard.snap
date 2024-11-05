@@ -1,0 +1,287 @@
+resource "datadog_dashboard" "../examples/screenboard.json" {
+notify_list = []
+title = "Laura's Screenboard 7 Sep 2020 13:18"
+description = ""
+
+widget {
+
+timeseries_definition {
+
+marker {
+label = " y = 5 "
+value = "y = 5"
+display_type = "error dashed"
+}
+marker {
+display_type = "error dashed"
+label = " y = 10 "
+value = "y = 10"
+}
+title_align = "left"
+show_legend = true
+legend_layout = "vertical"
+
+request {
+q = "avg:system.cpu.user{*}"
+
+style {
+line_type = "solid"
+line_width = "normal"
+palette = "dog_classic"
+}
+display_type = "line"
+}
+yaxis {
+include_zero = true
+min = "auto"
+max = "auto"
+scale = "linear"
+label = ""
+}
+title = ""
+title_size = "16"
+legend_columns = ["avg","min","max","value","sum"]
+}
+widget_layout {
+y = 17
+width = 47
+height = 15
+x = 3
+}
+}
+widget {
+widget_layout {
+x = 3
+y = 17
+width = 47
+height = 15
+}
+
+timeseries_definition {
+title = ""
+title_size = "16"
+title_align = "left"
+show_legend = false
+
+request {
+log_query {
+index = "*"
+search_query = "status:(error OR emergency)"
+
+group_by {
+facet = "service"
+sort_query {
+order = "desc"
+aggregation = "count"
+}
+limit = 10
+}
+compute_query {
+aggregation = "count"
+}
+}
+
+style {
+palette = "dog_classic"
+line_type = "solid"
+line_width = "normal"
+}
+display_type = "line"
+}
+}
+}
+widget {
+widget_layout {
+x = 52
+y = 0
+width = 47
+height = 15
+}
+
+heatmap_definition {
+title_align = "left"
+show_legend = false
+
+request {
+q = "avg:system.cpu.user{*}"
+
+style {
+palette = "dog_classic"
+}
+}
+title = "Avg of system.cpu.user over *"
+title_size = "16"
+}
+}
+widget {
+widget_layout {
+x = 3
+y = 33
+width = 47
+height = 15
+}
+
+query_value_definition {
+autoscale = true
+precision = 2
+title = "Avg of datadog.agent.running over *"
+title_size = "16"
+title_align = "left"
+
+request {
+q = "avg:datadog.agent.running{*}"
+aggregator = "avg"
+}
+}
+}
+widget {
+widget_layout {
+height = 15
+x = 3
+y = -1
+width = 47
+}
+
+timeseries_definition {
+show_legend = false
+legend_columns = ["avg","min","max","value","sum"]
+live_span = "1d"
+
+request {
+display_type = "line"
+q = "avg:system.cpu.user{*}"
+
+style {
+palette = "dog_classic"
+line_type = "solid"
+line_width = "normal"
+}
+}
+title = "CPU for past day"
+title_size = "16"
+title_align = "left"
+legend_layout = "vertical"
+yaxis {
+label = ""
+include_zero = true
+min = "auto"
+max = "auto"
+scale = "linear"
+}
+
+}
+}
+widget {
+widget_layout {
+height = 21
+x = 3
+y = 50
+width = 60
+}
+
+service_level_objective_definition {
+slo_id = "301437ffe3e951a48fdbde5687d90609"
+show_error_budget = true
+view_mode = "overall"
+title = "SLO: API requests"
+title_size = "16"
+title_align = "center"
+view_type = "detail"
+time_windows = ["7d","month_to_date","global_time"]
+global_time_target = "5"
+}
+}
+widget {
+widget_layout {
+y = 17
+width = 47
+height = 22
+x = 52
+}
+
+hostmap_definition {
+request {
+fill {
+q = "avg:system.cpu.user{*} by {host}"
+}
+}
+style {
+palette = "green_to_orange"
+palette_flip = false
+}
+node_type = "host"
+no_metric_hosts = true
+no_group_hosts = true
+title = ""
+title_size = "16"
+title_align = "left"
+}
+}
+widget {
+widget_layout {
+x = 64
+y = 40
+width = 61
+height = 25
+}
+
+manage_status_definition {
+title_size = "13"
+title_align = "left"
+summary_type = "combined"
+display_format = "list"
+color_preference = "text"
+hide_zero_counts = true
+show_last_triggered = true
+query = "tag:($monitor_env AND $app_group)"
+sort = "triggered,desc"
+}
+}
+widget {
+widget_layout {
+x = 101
+y = 1
+width = 20
+height = 25
+}
+
+note_definition {
+content = <<EOF
+` Shared Dashboards`
+https://app.datadoghq.com/dashboard/ezf-tjt-xcx
+EOF
+tick_pos = "50%"
+tick_edge = "left"
+background_color = "vivid_orange"
+font_size = "18"
+text_align = "center"
+show_tick = false
+}
+}
+widget {
+widget_layout {
+x = 968
+y = -242
+width = 33
+height = 21
+}
+
+log_stream_definition {
+title_size = "13"
+message_display = "expanded-md"
+sort {
+order = "desc"
+column = "service"
+}
+show_date_column = true
+show_message_column = true
+title = "Plugins"
+title_align = "left"
+indexes = []
+query = "$dd_env $app_group status:(error OR emergency)"
+}
+}
+
+layout_type = "free"
+is_read_only = false
+}
