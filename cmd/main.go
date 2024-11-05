@@ -35,7 +35,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	var parsedJson map[string]any
+	var parsedJson jmap
 	if err := json.Unmarshal(jsonData, &parsedJson); err != nil {
 		fmt.Fprintln(os.Stderr, "Error parsing JSON:", err)
 		os.Exit(1)
@@ -47,12 +47,12 @@ func main() {
 		if resourceName == "" {
 			resourceName = "monitor_1"
 		}
-		tf = generateMonitorTerraformCode(resourceName, parsedJson)
+		tf = must(generateMonitorTerraformCode(resourceName, parsedJson))
 	} else {
 		if resourceName == "" {
 			resourceName = "dashboard_1"
 		}
-		tf = generateDashboardTerraformCode(resourceName, parsedJson)
+		tf = must(generateDashboardTerraformCode(resourceName, parsedJson))
 	}
 
 	fmt.Println(tf)

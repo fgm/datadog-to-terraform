@@ -66,6 +66,20 @@ func jmapsFromAny(v any) (jmaps, error) {
 	return items, nil
 }
 
+func convertSlice[T any](v []T) string {
+	var result strings.Builder
+	result.WriteString("[")
+	max := len(v) - 1
+	for i, elem := range v {
+		result.WriteString(literalString(elem))
+		if i != max {
+			result.WriteString(",")
+		}
+	}
+	result.WriteString("]")
+	return result.String()
+}
+
 // Converts a string or list of strings value to a literal string representation
 func literalString(value any) string {
 	switch v := value.(type) {
@@ -74,18 +88,10 @@ func literalString(value any) string {
 			return fmt.Sprintf("<<EOF\n%s\nEOF", v)
 		}
 		return fmt.Sprintf("\"%s\"", v)
+	case []any:
+		return convertSlice(v)
 	case []string:
-		var result strings.Builder
-		result.WriteString("[")
-		max := len(v) - 1
-		for i, elem := range v {
-			result.WriteString(literalString(elem))
-			if i != max {
-				result.WriteString(",")
-			}
-		}
-		result.WriteString("]")
-		return result.String()
+		return convertSlice(v)
 	default:
 		return fmt.Sprintf("%v", value)
 	}

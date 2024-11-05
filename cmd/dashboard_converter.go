@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"sort"
 	"strings"
 )
 
@@ -351,10 +352,21 @@ func widgetDefinition(contents jmap) string {
 	})
 }
 
-func generateDashboardTerraformCode(resourceName string, dashboardData jmap) string {
-	var result strings.Builder
-	for k, v := range dashboardData {
-		result.WriteString(must(convertFromDefinition(DASHBOARD, k, v)))
+func generateDashboardTerraformCode(resourceName string, data jmap) (string, error) {
+	var (
+		result strings.Builder
+		keys   = make([]string, 0, len(data))
+	)
+	for k := range data {
+		keys = append(keys, k)
 	}
-	return fmt.Sprintf("resource \"datadog_dashboard\" \"%s\" {%s\n}", resourceName, result.String())
+	sort.Strings(keys)
+	for _, k := range keys {
+		s, err := convertFromDefinition(DASHBOARD, k, data[k])
+		if err != nil {
+			return "", err
+		}
+		result.WriteString(s)
+	}
+	return fmt.Sprintf("resource \"datadog_dashboard\" \"%s\" {%s\n}", resourceName, result.String()), nil
 }
