@@ -4,6 +4,7 @@ is_read_only = true
 layout_type = "ordered"
 notify_list = []
 reflow_type = "auto"
+restricted_roles = ["7e4f0109-a7e6-4254-b3fe-ff22b63efae3","681eee93-3844-40cc-a06f-b674b001abbd"]
 
 template_variable {
 default = "*"
