@@ -1,0 +1,43 @@
+resource "datadog_monitor" "monitor" {
+message = <<EOF
+Some other info..
+
+{{#is_alert}}Possible explanations are x, y or z. Check blah, blah blah.{{/is_alert}} 
+
+{{#is_warning}}CPU is at an acceptable level again{{/is_warning}} 
+
+@all 
+EOF
+name = "CPU is high on {{host.name}}"
+// Options
+escalation_message = ""
+evaluation_delay = 70
+groupby_simple_monitor = true
+include_tags = true
+locked = true
+new_group_delay = 60
+new_host_delay = 300
+no_data_timeframe = 10
+notify_audit = false
+notify_no_data = true
+on_missing_data = "default"
+renotify_interval = 0
+renotify_statuses = ["alert"]
+require_full_window = true
+monitor_threshold_windows {
+recovery_window = "last_15m"
+trigger_window = "last_15m"
+}
+monitor_thresholds {
+critical = 1
+critical_recovery = 0
+}
+timeout_h = 0
+// /Options
+
+priority = 2
+query = "avg(last_4h):anomalies(avg:system.cpu.user{*}, 'basic', 2, direction='both', alert_window='last_15m', interval=60, count_default_zero='true') >= 1"
+restricted_roles = ["5b647eb8-de36-11ed-aacf-da7ad0900002"]
+tags = ["team-cpu"]
+type = "metric alert"
+}

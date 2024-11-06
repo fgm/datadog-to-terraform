@@ -3,14 +3,22 @@ Take a look at the [Contributing Guidelines](../CONTRIBUTING.md) before submitti
 ***
 
 # Why?
+
 What is the context behind this change? What is the problem being solved? Link to issues if relevant.
 
 # How?
-Describe your solution and any technical decisions you made
+
+Describe your solution and any technical decisions you made.
 
 # UI Changes
-Screenshots of the change
+
+Since Jastify is a CLI tool, "screenshots" are actually better as text captures
+or [ASCIInema](https://asciinema.org/) recordings.
 
 ## Before
 
+(screenshot before)
+
 ## After
+
+(screenshot after)

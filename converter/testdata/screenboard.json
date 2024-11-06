@@ -182,7 +182,7 @@
       "layout": { "x": 101, "y": 1, "width": 20, "height": 25 },
       "definition": {
         "type": "note",
-        "content": "` Shared Dashbords`\nhttps://app.datadoghq.com/dashboard/ezf-tjt-xcx",
+        "content": "` Shared Dashboards`\nhttps://app.datadoghq.com/dashboard/ezf-tjt-xcx",
         "background_color": "vivid_orange",
         "font_size": "18",
         "text_align": "center",

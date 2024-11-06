@@ -1,6 +1,5 @@
-*.zip
 .DS_Store
-node_modules/
 .idea
+.run
 *.iml
 .history
