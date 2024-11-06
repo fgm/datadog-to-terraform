@@ -32,7 +32,7 @@ var DASHBOARD = map[string]stringFunc{
 	"layout_type":             stringGen("layout_type"),
 	"notify_list":             stringGen("notify_list"),
 	"reflow_type":             stringGen("reflow_type"),
-	"restricted_roles":        func(_ any) string { return "// restricted_roles is still in beta" },
+	"restricted_roles":        stringGen("restricted_roles"),
 	"template_variables": func(v any) string {
 		slice, ok := v.([]any)
 		if !ok {
@@ -368,5 +368,5 @@ func GenerateDashboardTerraformCode(resourceName string, data Jmap) (string, err
 		}
 		result.WriteString(s)
 	}
-	return fmt.Sprintf("resource \"datadog_dashboard\" \"%s\" {%s\n}", resourceName, result.String()), nil
+	return fmt.Sprintf("resource \"datadog_dashboard\" \"%s\" {%s\n}\n", resourceName, result.String()), nil
 }
