@@ -1,4 +1,4 @@
-package main
+package converter
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ func assignmentString(key string, value any) string {
 }
 
 // Creates a block with a name and converted contents
-func block(name string, contents jmap, converter func(string, any) string) string {
+func block(name string, contents Jmap, converter func(string, any) string) string {
 	var result strings.Builder
 	result.WriteString(fmt.Sprintf("\n%s {", name))
 	keys := make([]string, 0, len(contents))
@@ -32,7 +32,7 @@ func block(name string, contents jmap, converter func(string, any) string) strin
 }
 
 // Generates a list of blocks
-func blockList(array jmaps, blockName string, contentConverter func(string, any) string) string {
+func blockList(array Jmaps, blockName string, contentConverter func(string, any) string) string {
 	var result strings.Builder
 	result.WriteString("\n")
 	for _, elem := range array {
@@ -49,18 +49,18 @@ func convertFromDefinition(definitionSet map[string]stringFunc, name string, v a
 	return "", fmt.Errorf("can't convert key '%s' with value %#v", name, v)
 }
 
-// jmapsFromAny extract a jmaps from an "any" value which is actually a jmap
-// or a slice in which elements are also "any" values with a dynamic jmap value.
-func jmapsFromAny(v any) (jmaps, error) {
+// JmapsFromAny extract a Jmaps from an "any" value which is actually a Jmap
+// or a slice in which elements are also "any" values with a dynamic Jmap value.
+func JmapsFromAny(v any) (Jmaps, error) {
 	slice, ok := v.([]any)
 	if !ok {
 		return nil, fmt.Errorf("items expected as []any but got %T: %#v", v, v)
 	}
-	items := make(jmaps, len(slice))
+	items := make(Jmaps, len(slice))
 	for i, item := range slice {
-		items[i], ok = item.(jmap)
+		items[i], ok = item.(Jmap)
 		if !ok {
-			return nil, fmt.Errorf("item [%d] expected as jmap but got %T: %#v", i, item, item)
+			return nil, fmt.Errorf("item [%d] expected as Jmap but got %T: %#v", i, item, item)
 		}
 	}
 	return items, nil
@@ -98,7 +98,7 @@ func literalString(value any) string {
 }
 
 // Maps over contents and applies a converter function
-func mapContents(contents jmap, converter func(string, any) string) string {
+func mapContents(contents Jmap, converter func(string, any) string) string {
 	var result strings.Builder
 	keys := make([]string, 0, len(contents))
 	for k := range contents {
@@ -112,7 +112,7 @@ func mapContents(contents jmap, converter func(string, any) string) string {
 	return result.String()
 }
 
-func must[T any](x T, err error) T {
+func Must[T any](x T, err error) T {
 	if err != nil {
 		panic(err)
 	}
@@ -120,12 +120,12 @@ func must[T any](x T, err error) T {
 }
 
 // Creates a query block with a name and converted contents
-func queryBlock(name string, contents jmap, converter func(string, any) string) string {
+func queryBlock(name string, contents Jmap, converter func(string, any) string) string {
 	return fmt.Sprintf("\nquery {\n\n  %s {%s\n}}", name, mapContents(contents, converter))
 }
 
 // Generates a list of query blocks
-func queryBlockList(array jmaps, contentConverter func(string, any) string) string {
+func queryBlockList(array Jmaps, contentConverter func(string, any) string) string {
 	var result []string
 	result = append(result, "\n")
 	for _, elem := range array {

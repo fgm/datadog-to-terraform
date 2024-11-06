@@ -7,10 +7,12 @@ assignees: ""
 ---
 
 **Describe the bug**
+
 A clear and concise description of what the bug is.
 
 **To Reproduce**
-Some full example input which reproduces the bug, eg.
+
+Some full example input which reproduces the bug, e.g.
 
 ```json
 { "title": "An example screenboard which causes the issue" }
@@ -18,11 +20,14 @@ Some full example input which reproduces the bug, eg.
 
 **Expected terraform code**
 
-```
-resource "datadog_dashboard" "not broken, woo!" { ... }
+```terraform
+resource "datadog_dashboard" "dashboard-minimal" {
+  title = "An example screenboard which causes the issue"
+}
 ```
 
 **Screenshots**
+
 If applicable, add screenshots to help explain your problem.
 
 **Additional context**

@@ -1,4 +1,4 @@
-package main
+package converter
 
 import (
 	_ "embed"
@@ -9,26 +9,41 @@ import (
 	"github.com/sebdah/goldie/v2"
 )
 
-//go:embed testdata/monitor.json
-var monitorJSON []byte
+//go:embed testdata/dashboard-good.json
+var dashGoodJSON []byte
 
-func Test_generateMonitorTerraformCode(t *testing.T) {
-	// TODO Add sad test case.
+//go:embed testdata/dashboard-bad.json
+var dashBadJSON []byte
+
+//go:embed testdata/dashboard-minimal.json
+var dashMiniJSON []byte
+
+//go:embed testdata/screenboard.json
+var screenboardJSON []byte
+
+//go:embed testdata/timeboard.json
+var timeboardJSON []byte
+
+func Test_generateDashboardTerraformCode(t *testing.T) {
 	for _, test := range [...]struct {
 		name    string
 		input   []byte
 		errorRx string
 	}{
-		{"monitor", monitorJSON, ""},
+		{"dashboard-good", dashGoodJSON, ""},
+		{"dashboard-minimal", dashMiniJSON, ""},
+		{"dashboard-bad", dashBadJSON, "^can't convert key.*with value \".*\"$"},
+		{"screenboard", screenboardJSON, ""},
+		{"timeboard", timeboardJSON, ""},
 	} {
 		t.Run(test.name, func(t *testing.T) {
-			var j = make(jmap, 0)
+			var j = make(Jmap)
 			if err := json.Unmarshal(test.input, &j); err != nil {
 				t.Fatal(err)
 			}
 
 			g := goldie.New(t)
-			actual, err := generateMonitorTerraformCode(test.name, j)
+			actual, err := GenerateDashboardTerraformCode(test.name, j)
 			switch {
 			case test.errorRx == "" && err != nil:
 				t.Fatalf("unexpected error %v", err)

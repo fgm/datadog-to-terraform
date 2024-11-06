@@ -1,4 +1,4 @@
-package main
+package converter
 
 import (
 	"fmt"
@@ -13,8 +13,8 @@ var MONITOR = map[string]stringFunc{
 	"query":   stringGen("query"),
 	"type":    stringGen("type"),
 	"options": func(v any) string {
-		return "\n// Options" + mapContents(v.(jmap), func(k1 string, v1 any) string {
-			return must(convertFromDefinition(OPTIONS, k1, v1))
+		return "\n// Options" + mapContents(v.(Jmap), func(k1 string, v1 any) string {
+			return Must(convertFromDefinition(OPTIONS, k1, v1))
 		}) + "\n// /Options\n"
 	},
 	"id":               blankGen,
@@ -43,16 +43,16 @@ var OPTIONS = map[string]stringFunc{
 	"restricted_roles":       stringGen("restricted_roles"),
 	"silenced":               blankGen, // Deprecated
 	"threshold_windows": func(v any) string {
-		return block("monitor_threshold_windows", v.(jmap), assignmentString)
+		return block("monitor_threshold_windows", v.(Jmap), assignmentString)
 	},
 	"thresholds": func(v any) string {
-		return block("monitor_thresholds", v.(jmap), assignmentString)
+		return block("monitor_thresholds", v.(Jmap), assignmentString)
 	},
 	"timeout_h": stringGen("timeout_h"),
 	"validate":  stringGen("timeout_h"),
 }
 
-func generateMonitorTerraformCode(resourceName string, data jmap) (string, error) {
+func GenerateMonitorTerraformCode(resourceName string, data Jmap) (string, error) {
 	var (
 		result strings.Builder
 		keys   = make([]string, 0, len(data))

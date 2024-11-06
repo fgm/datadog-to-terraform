@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/fgm/datadogjsontoterraform/converter"
 )
 
 func main() {
@@ -19,25 +21,25 @@ func main() {
 		// No args: read from stdin
 		jsonData, err = io.ReadAll(os.Stdin)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error reading from stdin:", err)
+			_, _ = fmt.Fprintln(os.Stderr, "Error reading from stdin:", err)
 			os.Exit(1)
 		}
 	case 2:
 		// One arg: it's a file, read from it.
 		jsonData, err = os.ReadFile(os.Args[1])
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Error reading file:", err)
+			_, _ = fmt.Fprintln(os.Stderr, "Error reading file:", err)
 			os.Exit(1)
 		}
 		resourceName = os.Args[1]
 	default:
-		fmt.Fprintln(os.Stderr, "Usage: \nconvert < somefile.json\nor\nconvert somefile.json")
+		_, _ = fmt.Fprintln(os.Stderr, "Usage: \nconvert < somefile.json\nor\nconvert somefile.json")
 		os.Exit(1)
 	}
 
-	var parsedJson jmap
+	var parsedJson converter.Jmap
 	if err := json.Unmarshal(jsonData, &parsedJson); err != nil {
-		fmt.Fprintln(os.Stderr, "Error parsing JSON:", err)
+		_, _ = fmt.Fprintln(os.Stderr, "Error parsing JSON:", err)
 		os.Exit(1)
 	}
 
@@ -47,12 +49,12 @@ func main() {
 		if resourceName == "" {
 			resourceName = "monitor_1"
 		}
-		tf = must(generateMonitorTerraformCode(resourceName, parsedJson))
+		tf = converter.Must(converter.GenerateMonitorTerraformCode(resourceName, parsedJson))
 	} else {
 		if resourceName == "" {
 			resourceName = "dashboard_1"
 		}
-		tf = must(generateDashboardTerraformCode(resourceName, parsedJson))
+		tf = converter.Must(converter.GenerateDashboardTerraformCode(resourceName, parsedJson))
 	}
 
 	fmt.Println(tf)
