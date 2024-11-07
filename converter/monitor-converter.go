@@ -68,5 +68,5 @@ func GenerateMonitorTerraformCode(resourceName string, data Jmap) (string, error
 		}
 		result.WriteString(s)
 	}
-	return fmt.Sprintf("resource \"datadog_monitor\" \"%s\" {%s\n}", resourceName, result.String()), nil
+	return fmt.Sprintf("resource \"datadog_monitor\" \"%s\" {\n%s}\n", resourceName, result.String()), nil
 }

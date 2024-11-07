@@ -2,8 +2,13 @@ package converter
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
+)
+
+var (
+	nameExclusionTx = regexp.MustCompile(`[^-[:word:]]+`)
 )
 
 // Generates an assignment string for a key-value pair
@@ -12,13 +17,13 @@ func assignmentString(key string, value any) string {
 		return ""
 	}
 	displayValue := literalString(value)
-	return fmt.Sprintf("\n%s = %s", key, displayValue)
+	return fmt.Sprintf("%s = %s\n", key, displayValue)
 }
 
 // Creates a block with a name and converted contents
 func block(name string, contents Jmap, converter func(string, any) string) string {
 	var result strings.Builder
-	result.WriteString(fmt.Sprintf("\n%s {", name))
+	result.WriteString(fmt.Sprintf("%s {\n", name))
 	keys := make([]string, 0, len(contents))
 	for k := range contents {
 		keys = append(keys, k)
@@ -27,14 +32,13 @@ func block(name string, contents Jmap, converter func(string, any) string) strin
 	for _, k := range keys {
 		result.WriteString(converter(k, contents[k]))
 	}
-	result.WriteString("\n}")
+	result.WriteString("}\n")
 	return result.String()
 }
 
 // Generates a list of blocks
 func blockList(array Jmaps, blockName string, contentConverter func(string, any) string) string {
 	var result strings.Builder
-	result.WriteString("\n")
 	for _, elem := range array {
 		result.WriteString(block(blockName, elem, contentConverter))
 	}
@@ -121,15 +125,19 @@ func Must[T any](x T, err error) T {
 
 // Creates a query block with a name and converted contents
 func queryBlock(name string, contents Jmap, converter func(string, any) string) string {
-	return fmt.Sprintf("\nquery {\n\n  %s {%s\n}}", name, mapContents(contents, converter))
+	return fmt.Sprintf("query {\n  %s {\n%s}\n}\n", name, mapContents(contents, converter))
 }
 
 // Generates a list of query blocks
 func queryBlockList(array Jmaps, contentConverter func(string, any) string) string {
 	var result []string
-	result = append(result, "\n")
 	for _, elem := range array {
 		result = append(result, queryBlock("metric_query", elem, contentConverter))
 	}
 	return strings.Join(result, "")
+}
+
+// ResourceName converts any string to a version suitable for a Terraform resource name.
+func ResourceName(s string) string {
+	return nameExclusionTx.ReplaceAllString(s, "_")
 }

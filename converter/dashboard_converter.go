@@ -53,6 +53,7 @@ var DASHBOARD = map[string]stringFunc{
 			return Must(convertFromDefinition(TEMPLATE_VARIABLE_PRESET, k1, v1))
 		})
 	},
+	"tags":  stringGen("tags"),
 	"title": stringGen("title"),
 	"url":   stringGen("url"),
 	"widgets": func(v any) string {
@@ -83,13 +84,20 @@ var EVENT_QUERY_GROUP_BY = map[string]stringFunc{
 }
 
 var FORMULA = map[string]stringFunc{
-	"alias":   stringGen("alias"),
-	"formula": stringGen("formula_expression "),
+	"alias":             stringGen("alias"),
+	"cell_display_mode": stringGen("cell_display_mode"),
+	"formula":           stringGen("formula_expression "),
 	"limit": func(v any) string {
 		return block("limit", v.(Jmap), func(k1 string, v1 any) string {
 			return Must(convertFromDefinition(FORMULA_LIMIT, k1, v1))
 		})
 	},
+	//"number_format": func(v any) string {
+	//	return block("number_format", v.(Jmap), func(k1 string, v1 any) string {
+	//		return Must(convertFromDefinition(NUMBER_FORMAT, k1, v1))
+	//	})
+	//},
+	//"style": func(v any) string { return blockList(Jmaps{v.(Jmap)}, "style", assignmentString) },
 }
 
 var FORMULA_LIMIT = map[string]stringFunc{
@@ -125,10 +133,20 @@ var LOG_QUERY = map[string]stringFunc{
 	"search_query": stringGen("search_query"),
 }
 
+var NUMBER_FORMAT = map[string]stringFunc{
+	"unit": func(v any) string {
+		return block("unit", v.(Jmap), assignmentString)
+	},
+}
+
 var QUERY = map[string]stringFunc{
-	"name":        stringGen("name"),
+	"name": stringGen("name"),
+	// "indexes":      stringGen("indexes"),
 	"data_source": stringGen("data_source"),
 	"query":       stringGen("query"),
+	//"query_string": stringGen("query_string"),
+	//"sort":         stringGen("sort"),
+	//"storage":      stringGen("storage"), // TODO validate value "hot"
 }
 
 var REQUEST = map[string]stringFunc{
@@ -138,7 +156,13 @@ var REQUEST = map[string]stringFunc{
 	"apm_stats_query":   stringGen("apm_stats_query"),
 	"cell_display_mode": stringGen("cell_display_mode"),
 	"change_type":       stringGen("change_type"),
-	"compare_to":        stringGen("compare_to"),
+	//"columns": func(v any) string {
+	//	values := Must(JmapsFromAny(v))
+	//	return blockList(values, "columns", func(k string, v any) string {
+	//		return Must(convertFromDefinition(REQUEST_COLUMNS, k, v))
+	//	})
+	//},
+	"compare_to": stringGen("compare_to"),
 	"conditional_formats": func(v any) string {
 		formats := Must(JmapsFromAny(v))
 		return blockList(formats, "conditional_formats", assignmentString)
@@ -173,12 +197,38 @@ var REQUEST = map[string]stringFunc{
 		queries := Must(JmapsFromAny(v))
 		return queryBlockList(queries, assignmentString)
 	},
+	//"query": func(v any) string {
+	//	return block("query", v.(Jmap), func(k string, v any) string {
+	//		return Must(convertFromDefinition(QUERY, k, v))
+	//	})
+	//},
 	"response_format": stringGen("response_format"),
 	"rum_query":       stringGen("rum_query"),
 	"security_query":  stringGen("security_query"),
 	"show_present":    stringGen("show_present"),
-	"style": func(v any) string {
-		return blockList(Jmaps{v.(Jmap)}, "style", assignmentString)
+	//"sort": func(v any) string {
+	//	return block("sort", v.(Jmap), func(k1 string, v1 any) string {
+	//		return Must(convertFromDefinition(REQUEST_SORT, k1, v1))
+	//	})
+	//},
+	"style": func(v any) string { return blockList(Jmaps{v.(Jmap)}, "style", assignmentString) },
+	//"text_formats": func(v any) string {
+	//	formats := Must(JmapsFromAny(v))
+	//	return blockList(formats, "text_formats", assignmentString)
+	//},
+}
+
+var REQUEST_COLUMNS = map[string]stringFunc{
+	"field": stringGen("field"),
+	"width": stringGen("width"),
+}
+
+var REQUEST_SORT = map[string]stringFunc{
+	"count": stringGen("count"),
+	"order_by": func(v any) string {
+		return "" // FIXME
+		orders := Must(JmapsFromAny(v))
+		return blockList(orders, "order", assignmentString)
 	},
 }
 
@@ -222,24 +272,25 @@ func init() {
 			events := Must(JmapsFromAny(v))
 			return blockList(events, "event", assignmentString)
 		},
-		"event_size":         stringGen("event_size"),
-		"filters":            stringGen("filters"),
-		"font_size":          stringGen("font_size"),
-		"global_time_target": stringGen("global_time_target"),
-		"group":              stringGen("group"),
-		"group_by":           stringGen("group_by"),
-		"grouping":           stringGen("grouping"),
-		"has_padding":        blankGen,
-		"has_search_bar":     stringGen("has_search_bar"),
-		"hide_zero_counts":   stringGen("hide_zero_counts"),
-		"indexes":            stringGen("indexes"),
-		"layout_type":        stringGen("layout_type"),
-		"legend_columns":     stringGen("legend_columns"),
-		"legend_layout":      stringGen("legend_layout"),
-		"legend_size":        stringGen("legend_size"),
-		"live_span":          stringGen("live_span"),
-		"logset":             blankGen,
-		"margin":             stringGen("margin"),
+		"event_size":            stringGen("event_size"),
+		"filters":               stringGen("filters"),
+		"font_size":             stringGen("font_size"),
+		"global_time_target":    stringGen("global_time_target"),
+		"group":                 stringGen("group"),
+		"group_by":              stringGen("group_by"),
+		"grouping":              stringGen("grouping"),
+		"has_padding":           blankGen,
+		"has_search_bar":        stringGen("has_search_bar"),
+		"hide_zero_counts":      stringGen("hide_zero_counts"),
+		"indexes":               stringGen("indexes"),
+		"last_triggered_format": stringGen("last_triggered_format"),
+		"layout_type":           stringGen("layout_type"),
+		"legend_columns":        stringGen("legend_columns"),
+		"legend_layout":         stringGen("legend_layout"),
+		"legend_size":           stringGen("legend_size"),
+		"live_span":             stringGen("live_span"),
+		"logset":                blankGen,
+		"margin":                stringGen("margin"),
 		"markers": func(v any) string {
 			markers := Must(JmapsFromAny(v))
 			return blockList(markers, "marker", assignmentString)
@@ -264,8 +315,11 @@ func init() {
 		"show_latency":        stringGen("show_latency"),
 		"show_legend":         stringGen("show_legend"),
 		"show_message_column": stringGen("show_message_column"),
+		"show_priority":       stringGen("show_priority"),
 		"show_resource_list":  stringGen("show_resource_list"),
+		"show_status":         stringGen("show_status"),
 		"show_tick":           stringGen("show_tick"),
+		"show_title":          stringGen("show_title"),
 		"size_format":         stringGen("size_format"),
 		"sizing":              stringGen("sizing"),
 		"slo_id":              stringGen("slo_id"),
@@ -286,7 +340,11 @@ func init() {
 			}
 			return ""
 		},
-		"time_windows":   stringGen("time_windows"),
+		"time_windows": stringGen("time_windows"),
+		//"timeseries_background": func(v any) string {
+		//	// TODO Validate constraint: Max block length == 1
+		//	return block("timeseries_background", v.(Jmap), assignmentString)
+		//},
 		"title":          stringGen("title"),
 		"title_align":    stringGen("title_align"),
 		"title_size":     stringGen("title_size"),
@@ -347,7 +405,7 @@ func widgetDefinition(contents Jmap) string {
 	if definitionType == "slo" {
 		definitionType = "service_level_objective"
 	}
-	return block(fmt.Sprintf("\n%s_definition", definitionType), contents, func(k string, v any) string {
+	return block(fmt.Sprintf("%s_definition", definitionType), contents, func(k string, v any) string {
 		return Must(convertFromDefinition(WIDGET_DEFINITION, k, v))
 	})
 }
@@ -368,5 +426,5 @@ func GenerateDashboardTerraformCode(resourceName string, data Jmap) (string, err
 		}
 		result.WriteString(s)
 	}
-	return fmt.Sprintf("resource \"datadog_dashboard\" \"%s\" {%s\n}\n", resourceName, result.String()), nil
+	return fmt.Sprintf("resource \"datadog_dashboard\" \"%s\" {\n%s}\n", resourceName, result.String()), nil
 }

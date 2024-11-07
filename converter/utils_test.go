@@ -20,11 +20,11 @@ func Test_assignmentString(t *testing.T) {
 		inputValue any
 		expected   string
 	}{
-		{"integer value", "i", 7, "\ni = 7"},
+		{"integer value", "i", 7, "i = 7\n"},
 		{"nil value", "i", nil, ""},
-		{"single-line string", "sls", "foo", "\nsls = \"foo\""},
-		{"multi-line string", "mls", "foo\nbar", "\nmls = <<EOF\nfoo\nbar\nEOF"},
-		{"single-line strings list", "slsl", []string{"foo", "bar"}, "\nslsl = [\"foo\",\"bar\"]"},
+		{"single-line string", "sls", "foo", "sls = \"foo\"\n"},
+		{"multi-line string", "mls", "foo\nbar", "mls = <<EOF\nfoo\nbar\nEOF\n"},
+		{"single-line strings list", "slsl", []string{"foo", "bar"}, "slsl = [\"foo\",\"bar\"]\n"},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			if actual := assignmentString(test.inputName, test.inputValue); actual != test.expected {
@@ -36,11 +36,11 @@ func Test_assignmentString(t *testing.T) {
 
 func Test_block(t *testing.T) {
 	input := j1
-	const expected = `
-my_block {
+	const expected = `my_block {
 a_cool_key = "a cool value"
 another_key = "another value"
-}`
+}
+`
 
 	if actual := block("my_block", input, assignmentString); actual != expected {
 		t.Errorf("block output did not match: %v\n", cmp.Diff(expected, actual))
@@ -49,16 +49,15 @@ another_key = "another value"
 
 func Test_blockList(t *testing.T) {
 	input := Jmaps{j1, j2}
-	const expected = `
-
-my_block {
+	const expected = `my_block {
 a_cool_key = "a cool value"
 another_key = "another value"
 }
 my_block {
 a_cool_key = "another cool value"
 another_key = "another ANOTHER value"
-}`
+}
+`
 	if actual := blockList(input, "my_block", assignmentString); actual != expected {
 		t.Errorf("blockList output did not match: %v\n", cmp.Diff(expected, actual))
 	}
@@ -71,7 +70,7 @@ func Test_convertFromDefinition(t *testing.T) {
 		expected        string
 		expectedSuccess bool
 	}{
-		{"existing key", "is_read_only", "\nis_read_only = false", true},
+		{"existing key", "is_read_only", "is_read_only = false\n", true},
 		{"nonexistent key", "not a thing", "", false},
 	} {
 		t.Run(test.name, func(t *testing.T) {
@@ -128,9 +127,9 @@ func Test_JmapsFromAny(t *testing.T) {
 
 func Test_mapContents(t *testing.T) {
 	input := j1
-	const expected = `
-a_cool_key = "a cool value"
-another_key = "another value"`
+	const expected = `a_cool_key = "a cool value"
+another_key = "another value"
+`
 	if actual := mapContents(input, assignmentString); actual != expected {
 		t.Errorf("mapContents output did not match: %v\n", cmp.Diff(expected, actual))
 	}
@@ -163,13 +162,13 @@ func TestMust(t *testing.T) {
 
 func Test_queryBlock(t *testing.T) {
 	input := j1
-	const expected = `
-query {
-
+	const expected = `query {
   q1 {
 a_cool_key = "a cool value"
 another_key = "another value"
-}}`
+}
+}
+`
 	if actual := queryBlock("q1", input, assignmentString); actual != expected {
 		t.Errorf("queryBlock output did not match: %v\n", cmp.Diff(expected, actual))
 	}
@@ -177,20 +176,19 @@ another_key = "another value"
 
 func Test_queryBlockList(t *testing.T) {
 	input := Jmaps{j1, j2}
-	const expected = `
-
-query {
-
+	const expected = `query {
   metric_query {
 a_cool_key = "a cool value"
 another_key = "another value"
-}}
+}
+}
 query {
-
   metric_query {
 a_cool_key = "another cool value"
 another_key = "another ANOTHER value"
-}}`
+}
+}
+`
 	if actual := queryBlockList(input, assignmentString); actual != expected {
 		t.Errorf("queryBlockList output did not match: %v\n", cmp.Diff(expected, actual))
 	}

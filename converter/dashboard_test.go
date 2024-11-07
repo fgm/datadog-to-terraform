@@ -32,7 +32,7 @@ func Test_generateDashboardTerraformCode(t *testing.T) {
 	}{
 		{"dashboard-good", dashGoodJSON, ""},
 		{"dashboard-minimal", dashMiniJSON, ""},
-		{"dashboard-bad", dashBadJSON, "^can't convert key.*with value \".*\"$"},
+		{"dashboard-bad", dashBadJSON, "^can't convert key .* with value \".*\"$"},
 		{"screenboard", screenboardJSON, ""},
 		{"timeboard", timeboardJSON, ""},
 	} {
